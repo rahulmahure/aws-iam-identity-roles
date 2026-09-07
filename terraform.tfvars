@@ -1,0 +1,1 @@
+cloudops_role_name = "GroupAccess-CloudOps"
