@@ -34,7 +34,7 @@ jobs:
       - name: Terraform Init
         run: terraform init -backend-config=backend/test.hcl
 
-      # PR Checks Only
+      # PR Checks Only 
       - name: Terraform Format Check
         if: github.event_name == 'pull_request'
         run: terraform fmt -check -recursive
