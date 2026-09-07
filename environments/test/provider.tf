@@ -3,9 +3,9 @@ provider "aws" {
 
   default_tags {
     tags = {
-      Project     = "aws-iam-identity-roles"
-      Environment = "test"
-      ManagedBy   = "Terraform"
+      Project     = "https://github.com/rahulmahure/aws-iam-identity-roles.git"
+      Environment = "Test"
+      ManagedBy   = "CloudOps"
     }
   }
 }
