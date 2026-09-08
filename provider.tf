@@ -3,8 +3,8 @@ provider "aws" {
 
   default_tags {
     tags = {
-      Project     = "https://github.com/rahulmahure/aws-iam-identity-roles.git"
-      ManagedBy   = "CloudOps"
+      Project   = "https://github.com/rahulmahure/aws-iam-identity-roles.git"
+      ManagedBy = "CloudOps"
     }
   }
 }
