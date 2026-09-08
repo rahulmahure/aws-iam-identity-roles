@@ -1,4 +1,4 @@
-name: Terraform Deployment
+name: Terraform Dev Deployment
 
 on:
   pull_request:
@@ -32,7 +32,7 @@ jobs:
         uses: hashicorp/setup-terraform@v3
 
       - name: Terraform Init
-        run: terraform init -backend-config=backend/test.hcl
+        run: terraform init -backend-config=backend/dev.hcl
 
       # PR Checks Only 
       - name: Terraform Format Check
