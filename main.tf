@@ -17,28 +17,29 @@ data "aws_iam_policy_document" "cloudops_trust" {
   }
 }
 
-data "aws_iam_policy_document" "cloudops_custom_policy" {
+data "aws_iam_policy_document" "cloudops_policy" {
   statement {
+    sid    = "AllowDynamoDBListTables"
+    effect = "Allow"
     actions = [
-      "dynamodb:ListTables",
+      "dynamodb:ListTables"
     ]
     resources = ["*"]
   }
 }
 
-resource "aws_iam_role" "cloudops" {
-  name               = var.cloudops_role_name
-  assume_role_policy = data.aws_iam_policy_document.cloudops_trust.json
+module "group_access_cloudops" {
+  source             = "./modules/iam-role"
+  name               = "GroupAccess-CloudOps"
   description        = "CloudOps IAM role for cross-account access with MFA enforcement."
-}
-
-resource "aws_iam_role_policy_attachment" "cloudops_aws_policy" {
-  role       = aws_iam_role.cloudops.name
-  policy_arn = "arn:aws:iam::aws:policy/ReadOnlyAccess"
-}
-
-resource "aws_iam_role_policy" "cloudops_custom_policy" {
-  name   = "${var.cloudops_role_name}-cloudops-custom-policy"
-  role   = aws_iam_role.cloudops.id
-  policy = data.aws_iam_policy_document.cloudops_custom_policy.json
+  assume_role_policy = data.aws_iam_policy_document.cloudops_trust.json
+  policy_arns = [
+    "arn:aws:iam::aws:policy/ReadOnlyAccess"
+  ]
+  policy_documents_json = {
+    ddb = data.aws_iam_policy_document.cloudops_policy.json
+  }
+  tags = {
+    Team = "CloudOps"
+  }
 }
