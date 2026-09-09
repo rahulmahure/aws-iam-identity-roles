@@ -5,7 +5,7 @@ resource "aws_iam_role" "this" {
   tags               = var.tags
 }
 
-# Existing AWS Managed policies.
+# Existing AWS Managed policies
 resource "aws_iam_role_policy_attachment" "managed" {
   for_each = toset(var.policy_arns)
   role       = aws_iam_role.this.name
