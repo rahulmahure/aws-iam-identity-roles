@@ -22,7 +22,9 @@ data "aws_iam_policy_document" "cloudops_policy" {
     sid    = "AllowDynamoDBListTables"
     effect = "Allow"
     actions = [
-      "dynamodb:ListTables"
+      "dynamodb:ListTables",
+      "dynamodb:DescribeTable",
+      "dynamodb:Scan",
     ]
     resources = ["*"]
   }
