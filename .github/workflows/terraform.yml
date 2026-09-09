@@ -1,0 +1,84 @@
+name: Terraform Deployment
+
+on:
+  pull_request:
+    branches:
+      - main
+
+  push:
+    branches:
+      - main
+
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Select AWS environment"
+        required: true
+        type: choice
+        options:
+          - dev
+          - test
+          - prod
+        default: test
+
+      apply:
+        description: "Apply Terraform changes"
+        required: true
+        type: boolean
+        default: false
+
+# ============================================================
+# PR → TEST PLAN ONLY
+# ============================================================
+
+jobs:
+
+  terraform-pr:
+    name: Terraform TEST Plan
+    if: github.event_name == 'pull_request'
+
+    uses: ./.github/workflows/terraform-deploy.yml
+
+    with:
+      environment: test
+      apply: false
+
+    permissions:
+      id-token: write
+      contents: read
+
+# ============================================================
+# MERGE TO MAIN → TEST APPLY
+# ============================================================
+
+  terraform-test:
+    name: Terraform TEST Apply
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    uses: ./.github/workflows/terraform-deploy.yml
+
+    with:
+      environment: test
+      apply: true
+
+    permissions:
+      id-token: write
+      contents: read
+
+# ============================================================
+# MANUAL DEPLOYMENT → DEV / TEST / PROD
+# ============================================================
+
+  terraform-manual:
+    name: Terraform ${{ inputs.environment }}
+    if: github.event_name == 'workflow_dispatch'
+
+    uses: ./.github/workflows/terraform-deploy.yml
+
+    with:
+      environment: ${{ inputs.environment }}
+      apply: ${{ inputs.apply }}
+
+    permissions:
+      id-token: write
+      contents: read

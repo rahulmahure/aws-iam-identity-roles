@@ -1,0 +1,68 @@
+name: Reusable Terraform Deployment
+
+on:
+  workflow_call:
+
+    inputs:
+      environment:
+        description: "Deployment environment"
+        required: true
+        type: string
+
+      apply:
+        description: "Whether Terraform Apply should run"
+        required: true
+        type: boolean
+
+jobs:
+  terraform:
+    name: Terraform ${{ inputs.environment }}
+    runs-on: ubuntu-latest
+    # It selects the GitHub Environment:
+    #
+    # dev  → GitHub Environment "dev"
+    # test → GitHub Environment "test"
+    # prod → GitHub Environment "prod"
+    #
+    # Therefore the environment-specific
+    # AWS_ACCOUNT_ID / ROLE_NAME / AWS_REGION
+    # variables are automatically used.
+    environment: ${{ inputs.environment }}
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ vars.AWS_ACCOUNT_ID }}:role/${{ vars.ROLE_NAME }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Verify AWS Identity
+        run: aws sts get-caller-identity
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        run: |
+          terraform init \
+            -backend-config=backend/${{ inputs.environment }}.hcl
+
+      - name: Terraform Format Check
+        run: terraform fmt -check -recursive
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Plan
+        run: terraform plan -no-color
+
+      - name: Terraform Apply
+        if: inputs.apply == true
+        run: terraform apply -auto-approve
