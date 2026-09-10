@@ -41,7 +41,4 @@ module "group_access_cloudops" {
   policy_documents_json = {
     ddb = data.aws_iam_policy_document.cloudops_policy.json
   }
-  tags = {
-    Team = "CloudOps"
-  }
 }
