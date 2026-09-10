@@ -25,9 +25,3 @@ variable "policy_documents_json" {
   type        = map(string)
   default     = {}
 }
-
-variable "tags" {
-  description = "Tags to apply to IAM resources"
-  type        = map(string)
-  default     = {}
-}
